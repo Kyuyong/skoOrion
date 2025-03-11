@@ -74,7 +74,7 @@ const IdeaBorad = () => {
         </div>
         <div className="contents">
           <h1>
-            IdeaBorad (화면 구성 중)
+            아이디어 등록 게시판 (규용버전)
           </h1>
           <button>아이디어 등록</button>
           <DataTable slug="idea" columns={columns} rows={rows} />
