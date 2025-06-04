@@ -279,7 +279,11 @@ const IdeaPilot = ({ onClose, ideaId, ideaData, isViewMode }) => {
     <div className="PilotModalOverlay">
       <div className="PilotModalContent">
         <div className="titleBox">
-          <h2>{viewMode ? "현장 Pilot 결과" : "현장 Pilot 결과"}</h2>
+          <h2>
+            {viewMode
+              ? "현장 Pilot 결과 (효과성 재검증)"
+              : "현장 Pilot 결과 (효과성 재검증)"}
+          </h2>
           <CloseIcon className="closeIcon" onClick={onClose} />
         </div>
         <hr className="titleUnderline" />

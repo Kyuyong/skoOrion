@@ -483,7 +483,7 @@ const IdeaRegister = ({
     <div className="modalOverlay">
       <div className="modalContent">
         <div className="titleBox">
-          <h2>{editMode ? "IDEA 수정" : "IDEA 등록"}</h2>
+          <h2>{editMode ? "과제 수정" : "신규 과제 제안"}</h2>
           <CloseIcon className="closeIcon" onClick={onClose} />
         </div>
         <hr className="titleUnderline" />
@@ -600,7 +600,7 @@ const IdeaRegister = ({
                     control={<Radio />}
                     label="신규개발"
                   />
-                  <FormControlLabel
+                  {/* <FormControlLabel
                     value="고도화"
                     control={<Radio />}
                     label="고도화"
@@ -609,7 +609,7 @@ const IdeaRegister = ({
                     value="내재화"
                     control={<Radio />}
                     label="내재화"
-                  />
+                  /> */}
                 </RadioGroup>
               </FormControl>
             </div>

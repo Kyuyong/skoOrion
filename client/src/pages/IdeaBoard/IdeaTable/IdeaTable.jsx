@@ -82,6 +82,13 @@ const IdeaTable = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 팝업 관련 상태 추가
+  const [showPopup, setShowPopup] = useState(false);
+  const [dontShowToday, setDontShowToday] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
   // 필터 상태를 객체로 관리
   const [filters, setFilters] = useState({
     status: "선택",
@@ -93,6 +100,75 @@ const IdeaTable = () => {
     startDate: null,
     endDate: null,
   });
+
+  // 오늘 날짜 팝업을 보지 않았는지 확인하는 함수
+  const checkShouldShowPopup = () => {
+    const today = new Date().toDateString();
+    const hiddenDate = localStorage.getItem("hidePopupDate");
+    return hiddenDate !== today;
+  };
+
+  // 컴포넌트 마운트 시 팝업 표시 여부 확인
+  useEffect(() => {
+    if (checkShouldShowPopup()) {
+      setShowPopup(true);
+    }
+  }, []);
+
+  // 팝업 닫기 함수
+  const handleClosePopup = () => {
+    if (dontShowToday) {
+      const today = new Date().toDateString();
+      localStorage.setItem("hidePopupDate", today);
+    }
+    setShowPopup(false);
+    setDontShowToday(false);
+    setPosition({ x: 0, y: 0 }); // 위치 초기화
+  };
+
+  // 드래그 관련 함수들
+  const handleMouseDown = useCallback(
+    (e) => {
+      setDragging(true);
+      setDragStart({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      });
+    },
+    [position.x, position.y]
+  );
+
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (dragging) {
+        setPosition({
+          x: e.clientX - dragStart.x,
+          y: e.clientY - dragStart.y,
+        });
+      }
+    },
+    [dragging, dragStart.x, dragStart.y]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    setDragging(false);
+  }, []);
+
+  // 드래그 이벤트 리스너 추가/제거
+  useEffect(() => {
+    if (dragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    } else {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [dragging, handleMouseMove, handleMouseUp]);
 
   // 데이터 가져오기
   useEffect(() => {
@@ -131,7 +207,10 @@ const IdeaTable = () => {
 
         setRows(formattedData);
       } catch (error) {
-        console.error("아이디어 목록 가져오기 오류:", error);
+        // 개발 환경에서만 에러 로그 출력
+        if (process.env.NODE_ENV === "development") {
+          console.error("아이디어 목록 가져오기 오류:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -141,13 +220,13 @@ const IdeaTable = () => {
   }, [isModalOpen]); // 모달이 닫힐 때마다 데이터 새로고침
 
   // 날짜 포맷 함수
-  const formatDate = (dateString) => {
+  const formatDate = useCallback((dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return dateString;
 
     return date.toISOString().split("T")[0]; // YYYY-MM-DD 형식
-  };
+  }, []);
 
   // 필터 값 변경 핸들러
   const handleFilterChange = useCallback(
@@ -218,20 +297,28 @@ const IdeaTable = () => {
   }, [filters, rows]);
 
   // 행 클릭 핸들러 - 원본 idea_id로 상세 페이지 이동
-  const handleRowClick = (row) => {
-    console.log("Row clicked in IdeaTable:", row);
-    const url = `/ideaboard/detail/${row.idea_id}`; // idea_id를 사용하여 상세 페이지로 이동
-    console.log("Navigating to:", url);
-    navigate(url);
-  };
+  const handleRowClick = useCallback(
+    (row) => {
+      // 개발 환경에서만 로그 출력
+      if (process.env.NODE_ENV === "development") {
+        console.log("Row clicked in IdeaTable:", row);
+      }
+      const url = `/ideaboard/detail/${row.idea_id}`; // idea_id를 사용하여 상세 페이지로 이동
+      if (process.env.NODE_ENV === "development") {
+        console.log("Navigating to:", url);
+      }
+      navigate(url);
+    },
+    [navigate]
+  );
 
-  const handleOpenModal = () => {
+  const handleOpenModal = useCallback(() => {
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
-  };
+  }, []);
 
   return (
     <div className="ideaTable">
@@ -240,7 +327,7 @@ const IdeaTable = () => {
           src={`${process.env.PUBLIC_URL}/image/icons/idea.png`}
           alt="ideaicon"
         />
-        <h1>Idea Board</h1>
+        <h1>신규 제안</h1>
       </div>
 
       {/* 필터 영역 */}
@@ -313,10 +400,10 @@ const IdeaTable = () => {
       {/* 테이블 헤더 및 등록 버튼 */}
       <div className="headerRow">
         <span>
-          <span className="count-number">{filteredRows.length}</span>건의 Idea가
-          등록되었습니다
+          <span className="count-number">{filteredRows.length}</span>건의 신규
+          제안이 등록되었습니다
         </span>
-        <button onClick={handleOpenModal}>IDEA 등록</button>
+        <button onClick={handleOpenModal}>신규 제안 등록</button>
       </div>
 
       {/* 데이터 테이블 */}
@@ -333,6 +420,73 @@ const IdeaTable = () => {
 
       {/* 모달 컴포넌트 */}
       {isModalOpen && <IdeaRegister onClose={handleCloseModal} />}
+
+      {/* 팝업 모달 */}
+      {showPopup && (
+        <div className="popup-overlay">
+          <div
+            className="popup-modal"
+            style={{
+              transform: `translate(${position.x}px, ${position.y}px)`,
+              cursor: dragging ? "grabbing" : "grab",
+            }}
+          >
+            <div
+              className="popup-header"
+              onMouseDown={handleMouseDown}
+              style={{ cursor: "grab" }}
+            >
+              <h2>안내사항</h2>
+            </div>
+            <div className="popup-content">
+              <p>
+                본 페이지에서는
+                <br />
+                <span
+                  style={{
+                    color: "#d32f2f",
+                    fontWeight: "bold",
+                    fontSize: "20px",
+                  }}
+                >
+                  신규 개발이 필요한 과제에 대한 제안
+                </span>
+                만 받고 있습니다.
+                <br />
+                <br />
+                운영 중인 시스템 고도화 관련 제안은 추후 별도의 공지를 통해 접수
+                할 예정이오니, 이 점 양해 부탁드립니다.
+                <br />
+                <br />
+                과제 등록과 관련 궁금하신 사항은 담당자에게 문의해 주시면
+                신속하게 답변드리겠습니다.
+                <br />
+                <br />
+                ○ 담당자 : AI/DT기획PL 김민영, 전다현
+                <br />
+                <br />
+                감사합니다.
+              </p>
+            </div>
+            <div className="popup-footer">
+              <div className="checkbox-container">
+                <input
+                  type="checkbox"
+                  id="dontShowToday"
+                  checked={dontShowToday}
+                  onChange={(e) => setDontShowToday(e.target.checked)}
+                />
+                <label htmlFor="dontShowToday">
+                  오늘 하루 이 메시지 보지 않기
+                </label>
+              </div>
+              <button className="close-button" onClick={handleClosePopup}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

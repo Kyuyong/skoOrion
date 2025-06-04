@@ -95,7 +95,7 @@ menu {
 button {
   font-size: 14px;
   font-weight: bold;
-  width: 92px;
+  width: 120px;
   height: 30px;
   background-color: #333333;
   color: #ffffff;
@@ -105,4 +105,105 @@ button {
   align-items: center;
   justify-content: center;
   margin-right: 4px;
+}
+
+// 팝업 모달 스타일
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.popup-modal {
+  position: fixed;
+  top: 20px;
+  right: 220px; // 초기 위치 설정
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 400px;
+  max-width: 500px;
+  padding: 0;
+  overflow: hidden;
+  user-select: none; // 드래그 시 텍스트 선택 방지
+
+  .popup-header {
+    background-color: #5a5a5a;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+
+  .popup-content {
+    padding: 30px 20px;
+    text-align: center;
+
+    p {
+      margin: 0;
+      font-size: 16px;
+      color: #333;
+      line-height: 1.6;
+    }
+  }
+
+  .popup-footer {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+      }
+
+      label {
+        font-size: 14px;
+        color: #666;
+        cursor: pointer;
+        user-select: none;
+      }
+    }
+
+    .close-button {
+      background-color: #333333;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      width: auto;
+      height: auto;
+      margin: 0;
+
+      &:hover {
+        background-color: #4b5bbf;
+      }
+    }
+  }
 }

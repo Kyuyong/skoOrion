@@ -69,7 +69,7 @@ export const MainNavBar = () => {
         <div className="controls">
           <Link to="/dashboard" className="menu regLink">
             <LuClipboardEdit size={24} />
-            <span>Idea 등록</span>
+            <span>신규 제안</span>
           </Link>
           <Link to="/portfolio" className="menu regLink">
             <FaCode size={24} />

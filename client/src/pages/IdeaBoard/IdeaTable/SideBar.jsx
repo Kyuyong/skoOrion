@@ -27,10 +27,10 @@ const SideBar = () => {
         <div className="menuNm">Dashboard</div>
       </Link>
       <Link to="/ideaboard">
-        <div className="menuNm">IDEA 등록</div>
+        <div className="menuNm">신규 제안</div>
       </Link>
       <Link to="/ideaboard/devtable">
-        <div className="menuNm">과제 관리</div>
+        <div className="menuNm">개발 과제 관리</div>
       </Link>
       {isAdmin() && (
         <Link to="/ideaboard/solmgmt">
